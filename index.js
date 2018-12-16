@@ -5,7 +5,7 @@ import commandLineArgs from 'command-line-args'
 import CovariancePair from './classes/covariance-pair'
 
 import { createPairs } from './utils/array'
-import { getQuotes } from './api'
+import { getAssets } from './api'
 
 const optionDefinitions = [
   { name: 'symbols', type: String, multiple: true, defaultOptions: true },
@@ -16,9 +16,10 @@ const optionDefinitions = [
 const options = commandLineArgs(optionDefinitions)
 
 // Get history for all symbols
-const quotes = getQuotes(options.symbols)
+const quotes = getAssets(options.symbols, options.riskfree, options.marketreturn)
 
 Promise.all(quotes).then(results => {
+  console.log(results.map(result => result.toString()))
   const assets = {}
 
   results.forEach(asset => {
