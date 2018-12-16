@@ -1,0 +1,25 @@
+{
+  "name": "portfolio-designer",
+  "version": "1.0.0",
+  "description": "Finds the mix of assets in a portfolio to maximize the Sharpe Ratio",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jonburk/portfolio-designer.git"
+  },
+  "author": "Jonathan Burk",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jonburk/portfolio-designer/issues"
+  },
+  "homepage": "https://github.com/jonburk/portfolio-designer#readme",
+  "dependencies": {
+    "axios": "^0.18.0",
+    "command-line-args": "^5.0.2",
+    "lodash": "^4.17.11"
+  }
+}
