@@ -96,19 +96,26 @@ function createWeightDistributions (increment, count) {
   const percentages = 1 / increment + 1
   const maxRows = Math.pow(percentages, count)
   const weights = []
+  let previousRow = _.fill(Array(count), 0)
 
   for (let row = 0; row < maxRows; row++) {
-    weights.push(_.fill(Array(count), 0))
+    const currentRow = _.fill(Array(count), 0)
 
     if (row > 0) {
       for (let col = 0; col < count; col++) {
         if (row % Math.pow(percentages, (count - 1) - col) === 0) {
-          weights[row][col] = Math.round((weights[row - 1][col] + increment) * 100) / 100
+          currentRow[col] = Math.round((previousRow[col] + increment) * 100) / 100
           break
         } else {
-          weights[row][col] = weights[row - 1][col]
+          currentRow[col] = previousRow[col]
         }
       }
+    }
+
+    previousRow = currentRow
+
+    if (_.sum(currentRow) === 1) {
+      weights.push(currentRow)
     }
   }
 
