@@ -15,6 +15,15 @@ const optionDefinitions = [
 
 const options = commandLineArgs(optionDefinitions)
 
+// Defaults for risk free and market returns
+if (!options.riskfree) {
+  options.riskfree = 0.03
+}
+
+if (!options.marketreturn) {
+  options.marketreturn = 0.1
+}
+
 // Get history for all symbols
 const quotes = getAssets(options.symbols, options.riskfree, options.marketreturn)
 
