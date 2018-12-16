@@ -3,7 +3,7 @@
 import _ from 'lodash'
 
 export function calculateStandardDeviation (values, mean) {
-  return Math.sqrt(_.mean(values.map(value => (value - mean) ^ 2)))
+  return Math.sqrt(_.mean(values.map(value => Math.pow(value - mean, 2))))
 }
 
 export function calculateCovariance (a, b) {

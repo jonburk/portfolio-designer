@@ -15,7 +15,7 @@ class Asset {
     this.expectedReturn = expectedReturn
     this.meanReturn = meanReturn
     this.standardDeviation = standardDeviation
-    this.variance = standardDeviation ^ 2
+    this.variance = Math.pow(standardDeviation, 2)
   }
 }
 

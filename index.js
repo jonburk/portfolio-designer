@@ -8,6 +8,7 @@ import Portfolio from './classes/portfolio'
 
 import { createPairs } from './utils/array'
 import { getAssets } from './api'
+import { calculatePortfolioStandardDeviation } from './utils/capm'
 
 const optionDefinitions = [
   { name: 'symbols', type: String, multiple: true, defaultOptions: true },
@@ -47,7 +48,9 @@ Promise.all(quotes)
     })
 
     // Create portfolio with equal weights
-    const portfolio = new Portfolio(options.symbols.map((symbol, i) => new AssetWeight(symbol, 1 / options.symbols.length)))
+    const portfolio = new Portfolio(options.symbols.map((symbol, i) => new AssetWeight(assets[symbol], 1 / options.symbols.length)))
+    portfolio.standardDeviation = calculatePortfolioStandardDeviation(portfolio.assets, covariances)
+    portfolio.sharpeRatio = (portfolio.expectedReturn - options.riskfree) / portfolio.standardDeviation
 
     console.log(portfolio)
   })
