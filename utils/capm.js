@@ -12,8 +12,6 @@ export function calculatePortfolioStandardDeviation (assets, covariances) {
     map[asset.symbol] = asset
   })
 
-  console.log(covariances)
-
   return Math.sqrt(
     _.sum(assets.map(asset => Math.pow(asset.weight, 2) * asset.variance)) +
     _.sum(covariances.map(pair => {
