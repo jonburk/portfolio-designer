@@ -4,10 +4,12 @@ import _ from 'lodash'
 
 import { calculateStandardDeviation } from '../utils/stats'
 
+const TRADING_DAYS = 252
+
 class Asset {
   constructor (symbol, history, beta, expectedReturn) {
     const meanReturn = _.meanBy(history, 'changePercent')
-    const standardDeviation = calculateStandardDeviation(history.map(quote => quote.changePercent), meanReturn)
+    const standardDeviation = calculateStandardDeviation(history.map(quote => quote.changePercent), meanReturn) * Math.sqrt(TRADING_DAYS)
 
     this.symbol = symbol
     this.history = history

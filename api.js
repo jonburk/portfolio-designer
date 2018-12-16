@@ -15,7 +15,7 @@ export function getAssets (symbols, riskFreeReturn, marketReturn) {
 
     return getHistory(symbol)
       .then(result => {
-        history = result.data.map(value => new Quote(value.date, value.changePercent))
+        history = result.data.map(value => new Quote(value.date, value.changePercent / 100))
         return getStats(symbol)
       })
       .then(result => {

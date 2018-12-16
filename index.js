@@ -35,7 +35,7 @@ if (!options.marketreturn) {
 }
 
 if (!options.weightincrement) {
-  options.weightincrement = 0.5
+  options.weightincrement = 0.05
 }
 
 // Get history for all symbols
@@ -43,7 +43,6 @@ const quotes = getAssets(options.symbols, options.riskfree, options.marketreturn
 
 Promise.all(quotes)
   .then(results => {
-    console.log(results.map(result => `${result.symbol} β: ${result.beta} ER: ${result.expectedReturn} σ: ${result.standardDeviation}`))
     const assets = {}
 
     results.forEach(asset => {
@@ -55,12 +54,13 @@ Promise.all(quotes)
     const covariances = pairs.map(pair => new CovariancePair(assets[pair[0]], assets[pair[1]]))
 
     // Create all possible weights
-    const weightCombinations = []
-    createWeightDistributions(weightCombinations, 0, options.weightincrement, options.symbols.length)
+    const weightCombinations = createWeightDistributions(options.weightincrement, options.symbols.length)
 
     // Restrict to valid combinations
     _.remove(weightCombinations, weights => _.sum(weights) !== 1.0)
-    console.log(weightCombinations)
+
+    console.log('')
+    console.log(`Analyzing ${weightCombinations.length} portfolio combinations...`)
 
     // Create a portfolio for each weight
     const portfolios = weightCombinations.map(weights => {
@@ -72,28 +72,45 @@ Promise.all(quotes)
     })
 
     const optimalPortfolio = _.orderBy(portfolios, 'sharpeRatio', 'desc')[0]
+    console.log('')
+    console.log('Maximum Sharpe Ratio')
+    console.log('============================================================================================')
+    console.log('')
 
-    console.log(optimalPortfolio)
+    optimalPortfolio.assets.forEach(asset => {
+      console.log(`${asset.symbol}: ${asset.weight * 100}%`)
+    })
+
+    console.log(`Expected Return: ${Math.round(optimalPortfolio.expectedReturn * 10000) / 100}%`)
+    console.log(`Standard Deviation: ${Math.round(optimalPortfolio.standardDeviation * 10000) / 100}%`)
+    console.log(`Sharpe Ratio: ${Math.round(optimalPortfolio.sharpeRatio * 100) / 100}`)
+
+    console.log('')
+    console.log('============================================================================================')
   })
   .catch(error => {
     console.log(error)
   })
 
-function createWeightDistributions (weights, row, increment, count) {
-  weights.push(_.fill(Array(count), 0))
+function createWeightDistributions (increment, count) {
+  const percentages = 1 / increment + 1
+  const maxRows = Math.pow(percentages, count)
+  const weights = []
 
-  if (row > 0) {
-    for (let col = 0; col < count; col++) {
-      if (row % Math.pow(count, (count - 1) - col) === 0) {
-        weights[row][col] = weights[row - 1][col] + increment
-        break
-      } else {
-        weights[row][col] = weights[row - 1][col]
+  for (let row = 0; row < maxRows; row++) {
+    weights.push(_.fill(Array(count), 0))
+
+    if (row > 0) {
+      for (let col = 0; col < count; col++) {
+        if (row % Math.pow(percentages, (count - 1) - col) === 0) {
+          weights[row][col] = Math.round((weights[row - 1][col] + increment) * 100) / 100
+          break
+        } else {
+          weights[row][col] = weights[row - 1][col]
+        }
       }
     }
   }
 
-  if (weights.length < Math.pow(1 / increment + 1, count)) {
-    createWeightDistributions(weights, row + 1, increment, count)
-  }
+  return weights
 }
