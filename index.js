@@ -3,6 +3,8 @@
 import commandLineArgs from 'command-line-args'
 
 import CovariancePair from './classes/covariance-pair'
+import AssetWeight from './classes/asset-weight'
+import Portfolio from './classes/portfolio'
 
 import { createPairs } from './utils/array'
 import { getAssets } from './api'
@@ -27,21 +29,28 @@ if (!options.marketreturn) {
 // Get history for all symbols
 const quotes = getAssets(options.symbols, options.riskfree, options.marketreturn)
 
-Promise.all(quotes).then(results => {
-  console.log(results.map(result => result.toString()))
-  const assets = {}
+Promise.all(quotes)
+  .then(results => {
+    console.log(results.map(result => `${result.symbol} β: ${result.beta} ER: ${result.expectedReturn} σ: ${result.standardDeviation}`))
+    const assets = {}
 
-  results.forEach(asset => {
-    assets[asset.symbol] = asset
+    results.forEach(asset => {
+      assets[asset.symbol] = asset
+    })
+
+    // Calculate the covariance for all symbol pairs
+    const pairs = createPairs(options.symbols)
+    const covariances = pairs.map(pair => new CovariancePair(assets[pair[0]], assets[pair[1]]))
+
+    covariances.forEach(value => {
+      console.log(`${value.symbolA}, ${value.symbolB}: cov: ${value.covariance} ρ = ${value.correlation}`)
+    })
+
+    // Create portfolio with equal weights
+    const portfolio = new Portfolio(options.symbols.map((symbol, i) => new AssetWeight(symbol, 1 / options.symbols.length)))
+
+    console.log(portfolio)
   })
-
-  // Calculate the covariance for all symbol pairs
-  const pairs = createPairs(options.symbols)
-  const covariances = pairs.map(pair => new CovariancePair(assets[pair[0]], assets[pair[1]]))
-
-  covariances.forEach(value => {
-    console.log(`${value.symbolA}, ${value.symbolB}: ${value.covariance}`)
+  .catch(error => {
+    console.log(error)
   })
-}).catch(error => {
-  console.log(error)
-})

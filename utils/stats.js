@@ -34,3 +34,7 @@ export function calculateCovariance (a, b) {
 
   return numerator / (values.length - 1)
 }
+
+export function calculateCorrelation (standardDeviationA, standardDeviationB, covariance) {
+  return covariance / (standardDeviationA * standardDeviationB)
+}

@@ -15,10 +15,6 @@ class Asset {
     this.meanReturn = meanReturn
     this.standardDeviation = calculateStandardDeviation(history.map(quote => quote.changePercent), meanReturn)
   }
-
-  toString () {
-    return `${this.symbol} β: ${this.beta} ER: ${this.expectedReturn} σ: ${this.standardDeviation}`
-  }
 }
 
 module.exports = Asset
