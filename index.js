@@ -56,9 +56,6 @@ Promise.all(quotes)
     // Create all possible weights
     const weightCombinations = createWeightDistributions(options.weightincrement, options.symbols.length)
 
-    // Restrict to valid combinations
-    _.remove(weightCombinations, weights => _.sum(weights) !== 1.0)
-
     console.log('')
     console.log(`Analyzing ${weightCombinations.length} portfolio combinations...`)
 
