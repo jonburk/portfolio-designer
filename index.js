@@ -66,6 +66,10 @@ function calculateCovariance (pair, data) {
   const values = []
 
   for (let i = 0; i < length; i++) {
+    if (aValues[i].date !== bValues[i].date) {
+      throw new Error(`Stock price history dates do not align for ${pair[0]} and ${pair[1]}. Unable to calculate covariance.`)
+    }
+
     values.push({
       a: aValues[i].changePercent,
       b: bValues[i].changePercent
