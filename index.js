@@ -15,7 +15,8 @@ const optionDefinitions = [
   { name: 'symbols', type: String, multiple: true, defaultOptions: true },
   { name: 'riskfree', type: Number },
   { name: 'marketreturn', type: Number },
-  { name: 'weightincrement', type: Number }
+  { name: 'weightincrement', type: Number },
+  { name: 'maxweight', type: Number }
 ]
 
 const options = commandLineArgs(optionDefinitions)
@@ -38,6 +39,10 @@ if (!options.weightincrement) {
   options.weightincrement = 0.05
 }
 
+if (!options.maxweight) {
+  options.maxweight = 1
+}
+
 // Get history for all symbols
 const quotes = getAssets(options.symbols, options.riskfree, options.marketreturn)
 
@@ -54,7 +59,7 @@ Promise.all(quotes)
     const covariances = pairs.map(pair => new CovariancePair(assets[pair[0]], assets[pair[1]]))
 
     // Create all possible weights
-    const weightCombinations = createWeightDistributions(options.weightincrement, options.symbols.length)
+    const weightCombinations = createWeightDistributions(options.weightincrement, options.symbols.length, options.maxweight)
 
     console.log('')
     console.log(`Analyzing ${weightCombinations.length} portfolio combinations...`)
@@ -89,7 +94,7 @@ Promise.all(quotes)
     console.log(error)
   })
 
-function createWeightDistributions (increment, count) {
+function createWeightDistributions (increment, count, maxWeight) {
   const percentages = 1 / increment + 1
   const maxRows = Math.pow(percentages, count)
   const weights = []
@@ -111,7 +116,7 @@ function createWeightDistributions (increment, count) {
 
     previousRow = currentRow
 
-    if (_.sum(currentRow) === 1) {
+    if (_.sum(currentRow) === 1 && !_.find(currentRow, weight => weight > maxWeight)) {
       weights.push(currentRow)
     }
   }
